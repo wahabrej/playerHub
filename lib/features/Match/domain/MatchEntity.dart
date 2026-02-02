@@ -1,4 +1,4 @@
-class HomeMatchEntity {
+class MatchEntity {
   final String id;
   final String name;
   final String? logo;
@@ -11,7 +11,7 @@ class HomeMatchEntity {
   final String status;
   final bool votingOpen;
 
-  HomeMatchEntity({
+  MatchEntity({
     required this.id,
     required this.name,
     this.logo,
@@ -25,4 +25,3 @@ class HomeMatchEntity {
     required this.votingOpen,
   });
 }
-

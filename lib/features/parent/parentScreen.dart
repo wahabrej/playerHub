@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playerhub/features/home/presentation/pages/home_page.dart';
 import 'package:playerhub/features/parent/provider.dart';
 
+import '../Match/presentaion/screen/matchScreen.dart';
+import '../Player/presentation/screen/playerScreen.dart';
 import 'BottomNavBar.dart';
 
 
@@ -15,8 +17,8 @@ class Parentscreen extends ConsumerWidget {
 
     final pages = [
       HomePage(),
-      HomePage(),
-      HomePage(),
+      MatchScreen(),
+      Playerscreen(),
       HomePage(),
     ];
 
