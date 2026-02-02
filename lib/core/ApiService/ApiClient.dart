@@ -1,95 +1,49 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart'; // For debugPrint
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'package:playerhub/core/ApiService/ApiEndPoint.dart';
 
 class ApiClient {
   final Map<String, String> defaultHeaders;
+  final String? token;
 
-  ApiClient({
-    this.defaultHeaders = const {
-      "Content-Type": "application/json",
-    },
-  });
+  ApiClient({this.token, this.defaultHeaders = const {"Content-Type": "application/json"}});
 
-  /// GET request
-  Future<Map<String, dynamic>> get(String endpoint,
-      {Map<String, String>? headers}) async {
-    final url = endpoint;
-    debugPrint('GET Request → $url');
-    debugPrint('Headers: ${{...defaultHeaders, ...?headers}}');
-
-    final response = await http.get(Uri.parse(url), headers: {...defaultHeaders, ...?headers});
-    return _processResponse(response, url, null);
+  Map<String, String> _buildHeaders(Map<String, String>? headers) {
+    final allHeaders = {...defaultHeaders, ...?headers};
+    if (token != null) {
+      allHeaders['Authorization'] = 'Bearer $token';
+    }
+    return allHeaders;
   }
 
-  /// POST request
-  Future<Map<String, dynamic>> post(String endpoint,
-      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
-    final url = endpoint;
-    debugPrint('POST Request → $url');
-    debugPrint('Headers: ${{...defaultHeaders, ...?headers}}');
-    debugPrint('Body: ${body != null ? jsonEncode(body) : {}}');
+  // Changed return type to Future<dynamic>
+  Future<dynamic> get(String endpoint, {Map<String, String>? headers}) async {
+    final response = await http.get(Uri.parse(endpoint), headers: _buildHeaders(headers));
+    return _processResponse(response, endpoint);
+  }
 
+  Future<dynamic> post(String endpoint, {Map<String, String>? headers, Map<String, dynamic>? body}) async {
     final response = await http.post(
-      Uri.parse(url),
-      headers: {...defaultHeaders, ...?headers},
+      Uri.parse(endpoint),
+      headers: _buildHeaders(headers),
       body: body != null ? jsonEncode(body) : null,
     );
-
-    return _processResponse(response, url, body);
+    return _processResponse(response, endpoint);
   }
 
-  /// PUT request
-  Future<Map<String, dynamic>> put(String endpoint,
-      {Map<String, String>? headers, Map<String, dynamic>? body}) async {
-    final url = endpoint;
-    debugPrint('PUT Request → $url');
-    debugPrint('Headers: ${{...defaultHeaders, ...?headers}}');
-    debugPrint('Body: ${body != null ? jsonEncode(body) : {}}');
-
-    final response = await http.put(
-      Uri.parse(url),
-      headers: {...defaultHeaders, ...?headers},
-      body: body != null ? jsonEncode(body) : null,
-    );
-
-    return _processResponse(response, url, body);
-  }
-
-  /// DELETE request
-  Future<Map<String, dynamic>> delete(String endpoint,
-      {Map<String, String>? headers}) async {
-    final url = '${ApiEndPoint.baseUrl}$endpoint';
-    debugPrint('DELETE Request → $url');
-    debugPrint('Headers: ${{...defaultHeaders, ...?headers}}');
-
-    final response = await http.delete(
-      Uri.parse(url),
-      headers: {...defaultHeaders, ...?headers},
-    );
-
-    return _processResponse(response, url, null);
-  }
-
-  /// Process response
-  Map<String, dynamic> _processResponse(
-      http.Response response, String url, Map<String, dynamic>? body) {
-    debugPrint('Response from $url → Status: ${response.statusCode}');
-    debugPrint('Response body: ${response.body}');
-
+  // The critical fix is here
+  dynamic _processResponse(http.Response response, String url) {
     final statusCode = response.statusCode;
     final responseBody = response.body;
 
     if (statusCode >= 200 && statusCode < 300) {
       if (responseBody.isNotEmpty) {
-        return jsonDecode(responseBody) as Map<String, dynamic>;
-      } else {
-        return {};
+        // We REMOVED "as Map<String, dynamic>" to allow Lists
+        return jsonDecode(responseBody);
       }
+      return {};
     } else {
-      debugPrint('API Error at $url → Status: $statusCode, Body: $responseBody');
-      throw Exception('API Error: $statusCode ${response.body}');
+      throw Exception('API Error: $statusCode $responseBody');
     }
   }
 }

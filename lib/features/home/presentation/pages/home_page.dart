@@ -4,248 +4,87 @@ import '../providers/home_provider.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final homeAsync = ref.watch(homeProvider);
+    // দুটি প্রোভাইডারকেই ওয়াচ (watch) করুন
+    final matchesAsync = ref.watch(homeMatchesProvider);
+    final dashboardAsync = ref.watch(dashboardDataProvider);
+
     return Scaffold(
-      body: SafeArea(
-        child: homeAsync.when(
-          data: (items) {
-            if (items.isEmpty) {
-              return const Center(child: Text('No data available'));
-            }
-            final data = items.first;
-
-            return SingleChildScrollView(
+      appBar: AppBar(title: const Text('Admin Dashboard')),
+      body: Column(
+        children: [
+          // ১. টপ সাইড ড্যাশবোর্ড সেকশন
+          dashboardAsync.when(
+            data: (stats) => Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: GridView.count(
+                shrinkWrap: true, // কলামের ভেতরে ব্যবহারের জন্য জরুরি
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2.5,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(),
-                        child: Image.asset(
-                          "assets/images/user.png",
-                          height: 60,
-                          width: 60,
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Good morning !',
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                ),
-                          ),
-                          Text(
-                            'Hello Mohammad',
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 17,
-                                ),
-                          ),
-                        ],
-                      ),
-
-                      Spacer(),
-
-                      Image.asset("assets/icons/notification.png",height: 20,),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Scan Menu Card
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Colors.pinkAccent, Colors.orangeAccent],
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Scan any menu & get your perfect pick\nBased on your diet goals',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: () {
-
-                          },
-                          icon: const Icon(
-                            Icons.camera_alt,
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            'Scan Now',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black.withOpacity(0.3),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          "Today's NAI Score",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 8),
-                        Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            SizedBox(
-                              width: 140,
-                              height: 140,
-                              child: CircularProgressIndicator(
-                                value: data.naiScore / 100,
-                                strokeWidth: 16,
-                                backgroundColor: Colors.grey[300],
-                                valueColor: const AlwaysStoppedAnimation(
-                                  Colors.green,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              '${data.naiScore.toInt()}',
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(
-                          '/100',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Daily Intake Progress
-                  Text(
-                    "Daily Intake Progress ${data.dailyIntakeProgress}",
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Sodium Warning
-                  if (data.sodiumStatus == 'high')
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.red[50],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.warning_amber_rounded, color: Colors.red),
-                          SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Sodium intake high this week',
-                              style: TextStyle(color: Colors.red),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 24),
-
-                  // NAI Tracking Graph (simple bar chart for demo)
-                  Text(
-                    'NAI Score Tracking',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 180,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: data.dailyScores.length,
-                      itemBuilder: (context, index) {
-                        final day = data.dailyScores[index];
-                        final score = day['score'] as double;
-                        final isToday =
-                            day['day'] == '08'; // Assume last is today
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                width: 40,
-                                height: score * 1.5,
-                                decoration: BoxDecoration(
-                                  color: isToday
-                                      ? Colors.redAccent
-                                      : Colors.blue,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                day['day'],
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              Text(
-                                '${score.toInt()}',
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Daily Nutrition Completion
-                  Text(
-                    'Complete daily nutrition ${data.completionPercentage.toInt()}%',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                   SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: data.completionPercentage / 100,
-                    minHeight: 12,
-                    backgroundColor: Colors.grey[300],
-                    valueColor:  AlwaysStoppedAnimation(Colors.green),
-                  ),
-                   SizedBox(height: 8),
-                  Text(
-                    '${data.caloriesEaten} Calories Eaten / ${data.caloriesNeeded} Calories Needed',
-                  ),
+                  _buildStatCard("Players", stats.totalPlayer.toString(), Colors.blue),
+                  _buildStatCard("Matches", stats.totalMatch.toString(), Colors.orange),
+                  _buildStatCard("Parents", stats.totalParents.toString(), Colors.green),
+                  _buildStatCard("Reg. Players", stats.totalRegisterPlayer.toString(), Colors.purple),
                 ],
               ),
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, _) => Center(child: Text('Error: $err')),
-        ),
+            ),
+            loading: () => const LinearProgressIndicator(),
+            error: (err, _) => Text('Stats Error: $err'),
+          ),
+
+          const Divider(thickness: 2),
+
+          // ২. ম্যাচ লিস্ট সেকশন
+          Expanded(
+            child: matchesAsync.when(
+              data: (matches) {
+                if (matches.isEmpty) return const Center(child: Text('No matches found'));
+                return ListView.builder(
+                  itemCount: matches.length,
+                  itemBuilder: (context, index) {
+                    final match = matches[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: ListTile(
+                        leading: match.logo != null
+                            ? Image.network(match.logo!)
+                            : const Icon(Icons.sports_soccer),
+                        title: Text(match.name),
+                        subtitle: Text('${match.date} | ${match.stadium}'),
+                        trailing: Text('Goals: ${match.totalGoals}'),
+                      ),
+                    );
+                  },
+                );
+              },
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text('Matches Error: $err')),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String title, String value, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
+          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        ],
       ),
     );
   }

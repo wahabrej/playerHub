@@ -34,8 +34,8 @@ class ApiEndPoint {
   static const String getAllPlayerList = '$baseUrl/api/admin//all-Player';
 
   // match management
-  static String getAllMatchList(int page, int limit) =>
-      '$baseUrl/api/match/all-match?page=$page&limit=$limit';
+  static String getAllMatchList =
+      '$baseUrl/api/match/all-match';
 
   static String selectPlayerForMatch(String matchId) =>
       '$baseUrl/api/admin/$matchId/update-players';
