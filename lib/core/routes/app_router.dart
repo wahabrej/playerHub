@@ -16,7 +16,7 @@ class AppRoutes {
     RouteNames.loginScreenOrSignUp:(context) => const SignUpOrLoginScreen(),
     RouteNames.loginScreen:(context) =>  LoginScreen(),
     RouteNames.signUpScreen:(context) =>  SignUpScreen(),
-    RouteNames.parentScreen:(context) => const Parentscreen()
+    RouteNames.parentScreen:(context) => const ParentScreen()
 
   };
 

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:playerhub/features/Player/presentation/provider/PlayerProvider.dart';
 
-class Playerscreen extends ConsumerWidget {
-  const Playerscreen({super.key});
+import '../../../../core/ApiService/ApiEndPoint.dart';
+
+class PlayerScreen extends ConsumerWidget {
+  const PlayerScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,9 +53,9 @@ class Playerscreen extends ConsumerWidget {
               return Card(
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
-                  // leading: match.logo.
-                  //     ? Image.network(match.logo)
-                  //     : const Icon(Icons.sports_soccer),
+                  leading: match.avatar != null
+                      ? Image.network(ApiEndPoint.imagePath(match.avatar!))
+                      : const Icon(Icons.sports_soccer),
 
                   title: Text(match.name),
 
