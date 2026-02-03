@@ -5,11 +5,12 @@ import 'package:playerhub/features/parent/provider.dart';
 
 import '../Match/presentaion/screen/matchScreen.dart';
 import '../Player/presentation/screen/playerScreen.dart';
+import '../report/reportScreen.dart';
 import 'BottomNavBar.dart';
 
 
-class Parentscreen extends ConsumerWidget {
-  const Parentscreen({super.key});
+class ParentScreen extends ConsumerWidget {
+  const ParentScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,8 +19,8 @@ class Parentscreen extends ConsumerWidget {
     final pages = [
       HomePage(),
       MatchScreen(),
-      Playerscreen(),
-      HomePage(),
+      PlayerScreen(),
+      ReportScreen(),
     ];
 
     return Scaffold(

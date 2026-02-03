@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:playerhub/core/ApiService/ApiEndPoint.dart';
 import '../providers/home_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -53,7 +54,7 @@ class HomePage extends ConsumerWidget {
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: ListTile(
                         leading: match.logo != null
-                            ? Image.network(match.logo!)
+                            ? Image.network(ApiEndPoint.imagePath(match.logo!))
                             : const Icon(Icons.sports_soccer),
                         title: Text(match.name),
                         subtitle: Text('${match.date} | ${match.stadium}'),
